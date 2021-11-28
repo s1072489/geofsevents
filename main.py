@@ -260,4 +260,4 @@ async def role(ctx):
 
 
 if __name__ == "__main__":
-	client.run("")
+	client.run("I keep leaking my token :)")
