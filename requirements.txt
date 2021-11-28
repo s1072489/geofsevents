@@ -1,0 +1,4 @@
+nextcord==2.0.0a3
+pymongo==3.12.0
+dnspython==2.1.0
+certifi==2021.10.8
