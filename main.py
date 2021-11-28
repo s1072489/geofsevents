@@ -245,46 +245,6 @@ async def info(ctx, member=None):
 		await ctx.reply(embed=embed)
 
 
-@client.command()
-@commands.has_role("Bossman")
-async def reset():
-	"""Resets all attendance points and roles"""
-
-	await ctx.trigger_typing()
-
-	await ctx.send("Reseting Attendance Points...")
-	old = db.find_all({})
-
-	db.bulk_write([UpdateOne({'_id': member['_id']}, {"$set": {"A": 0}}) for member in old], ordered=False)
-
-	await ctx.send("Attendance Points reset!\nEditing members of the server...")
-
-	Guild = await client.get_guild(553718744233541656)
-
-	list_of_roles_to_remove = [role for role in list_of_roles if role != list_of_roles['Trainee_Pilot']]
-
-	for member in Guild.members:
-		try:
-			member_roles_remove = [role for role in member.roles if role in list_of_roles_to_remove]
-			if member_roles_remove:
-				await member.remove_roles(tuple(member_roles_remove))
-			else:
-				pass
-		except Exception as e:
-			await ctx.send(f"Error occured when trying to edit roles of {member.mention}\nThis was most likely caused because the bot does not have sufficient permissions")
-			await ctx.send(f"```css\n[{time.strftime('%H:%M:%S', time.gmtime())} ERROR]: {e}```")
-
-	await ctx.send("Roles reset!\nVerifying all changes have been made...")
-
-	Guild = await client.get_guild(553718744233541656)
-
-	for member in Guild.members:
-		if [role for role in member.roles if role in list_of_roles]:
-			await ctx.send(f"Role found on {member.mention}")
-
-	await ctx.reply("Reset Complete")
-
-
 @client.event
 async def on_command_error(ctx, error):
 	if isinstance(error, commands.MissingRole):
@@ -298,50 +258,6 @@ async def on_command_error(ctx, error):
 async def role(ctx):
 	await ctx.reply("Temporarily Disabled")
 
-# 	for user["_ID"] in db.find_all({}):
-
-# 	if database_user["A"] >= 12:
-# 		if list_of_roles["Senior_Pilot"] in roles:
-# 			await ctx.reply("You already have the highest role!")
-# 		else:
-# 			try:
-# 				await user.remove_roles(list_of_roles["Commercial_Pilot"])
-# 			except:
-# 				pass
-# 			await user.add_roles(list_of_roles["Senior_Pilot"])
-# 			await ctx.reply("You have been given `Senior Pilot`!")
-# 	elif database_user["A"] >= 8:
-# 		if list_of_roles["Commercial_Pilot"] in roles:
-# 			await ctx.reply("You already have `Commercial Pilot`!")
-# 		else:
-# 			try:
-# 				await user.remove_roles(list_of_roles["Private_Pilot"])
-# 			except:
-# 				pass
-# 			await user.add_roles(list_of_roles["Commercial_Pilot"])
-# 			await ctx.reply("You have been given `Commercial Pilot`!")
-# 	elif database_user["A"] >= 4:
-# 		if list_of_roles["Private_Pilot"] in roles:
-# 			await ctx.reply("You already have `Private Pilot`!")
-# 		else:
-# 			try:
-# 				await user.remove_roles(list_of_roles["Student_Pilot"])
-# 			except:
-# 				pass
-# 			await user.add_roles(list_of_roles["Private_Pilot"])
-# 			await ctx.reply("You have been given `Private Pilot`!")
-# 	elif database_user["A"] >= 1:
-# 		if list_of_roles["Student_Pilot"] in roles:
-# 			await ctx.reply("You already have `Student Pilot`!")
-# 		else:
-# 			try:
-# 				await user.remove_roles(list_of_roles["Trainee_Pilot"])
-# 			except:
-# 				pass
-# 			await user.add_roles(list_of_roles["Student_Pilot"])
-# 			await ctx.reply("You have been given `Student Pilot`!")
-# 	else:
-# 		await ctx.reply("You do not have enough points")
 
 if __name__ == "__main__":
 	client.run("")
