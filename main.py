@@ -11,7 +11,7 @@ from pymongo import MongoClient, InsertOne, UpdateOne
 
 # MongoDB
 ca = certifi.where()
-mongo = MongoClient('', tlsAllowInvalidCertificates=True, ssl_cert_reqs=ca)
+mongo = MongoClient('not leaking this either :)', tlsAllowInvalidCertificates=True, ssl_cert_reqs=ca)
 db = mongo.database.logbook
 temp = mongo.database.current
 status_db = mongo.database.status
@@ -67,7 +67,7 @@ async def help(ctx):
 
 @client.command()
 async def rank(ctx):
-    await ctx.reply("Not implemented yet :)")
+    await ctx.reply("Not implemented yet :). For now, use: ")
 
 
 @client.command()
@@ -302,9 +302,62 @@ async def on_command_error(ctx, error):
 
 
 @client.command()
-async def role(ctx):
-    await ctx.reply("Disabled")
+@commands.is_owner()
+async def role(ctx, user=None):
+    if type(user) == str:
+        user = ctx.message.guild.get_member(
+            int(user.replace("<@", "").replace("!", "").replace(">", "")))
+    elif user == None:
+        user = ctx.author
+    else:
+        await ctx.reply("Invalid member")
+        return
 
+    database_user = db.find_one({"_id":user.id})
+    roles = ctx.message.author.roles
+
+    if database_user["A"] >= 12:
+        if list_of_roles["Senior_Pilot"] in roles:
+            await ctx.reply("You already have the highest role!")
+        else:
+            try:
+                await user.remove_roles(list_of_roles["Commercial_Pilot"])
+            except:
+                pass
+            await user.add_roles(list_of_roles["Senior_Pilot"])
+            await ctx.reply("You have been given `Senior Pilot`!")
+    elif database_user["A"] >= 8:
+        if list_of_roles["Commercial_Pilot"] in roles:
+            await ctx.reply("You already have `Commercial Pilot`!")
+        else:
+            try:
+                await user.remove_roles(list_of_roles["Private_Pilot"])
+            except:
+                pass
+            await user.add_roles(list_of_roles["Commercial_Pilot"])
+            await ctx.reply("You have been given `Commercial Pilot`!")
+    elif database_user["A"] >= 4:
+        if list_of_roles["Private_Pilot"] in roles:
+            await ctx.reply("You already have `Private Pilot`!")
+        else:
+            try:
+                await user.remove_roles(list_of_roles["Student_Pilot"])
+            except:
+                pass
+            await user.add_roles(list_of_roles["Private_Pilot"])
+            await ctx.reply("You have been given `Private Pilot`!")
+    elif database_user["A"] >= 1:
+        if list_of_roles["Student_Pilot"] in roles:
+            await ctx.reply("You already have `Student Pilot`!")
+        else:
+            try:
+                await user.remove_roles(list_of_roles["Trainee_Pilot"])
+            except:
+                pass
+            await user.add_roles(list_of_roles["Student_Pilot"])
+            await ctx.reply("You have been given `Student Pilot`!")
+    else:
+        await ctx.reply("You do not have enough points")
 
 if __name__ == "__main__":
-    client.run("I shall not leak my token again :)")
+    client.run("I NEARLY LEAKED IT")
